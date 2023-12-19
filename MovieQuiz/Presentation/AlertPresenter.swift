@@ -8,7 +8,7 @@
 import UIKit
 
 class AlertPresenter {
-    var viewContoller: UIViewController
+    weak var viewContoller: UIViewController?
     
     init(viewContoller: UIViewController) {
         self.viewContoller = viewContoller
@@ -31,6 +31,6 @@ class AlertPresenter {
         
         alert.addAction(action)
         
-        viewContoller.present(alert, animated: true, completion: nil)
+        viewContoller?.present(alert, animated: true, completion: nil)
     }
 }
