@@ -7,8 +7,9 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     @IBOutlet private var textLabel: UILabel!
     @IBOutlet private var imageView: UIImageView!
     
+    @IBOutlet private var activityIndicator: UIActivityIndicatorView!
     private var questionsAmount: Int = 10 // общее количество вопросов для квиза. Пусть оно будет равно десяти.
-    private var questionFactory: QuestionFactoryProtocol? = QuestionFactory() // фабрика вопросов. Контроллер будет обращаться за вопросами к ней.
+    private var questionFactory: QuestionFactoryProtocol?// фабрика вопросов. Контроллер будет обращаться за вопросами к ней.
     private var currentQuestion: QuizQuestion? // вопрос, который видит пользователь.
     private var currentQuestionIndex = 0
     private var correctAnswers = 0
@@ -16,26 +17,29 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     private var statisticService: StatisticService? = StatisticServiceImplementation()
     
     override func viewDidLoad() {
-        questionFactory?.delegate = self
-        questionFactory?.requestNextQuestion()
+        super.viewDidLoad()
+        
+        questionFactory = QuestionFactory(moviesLoader: MoviesLeader(), delegate: self)
+        questionFactory?.loadData()
+        showLoadingIndicator()
         
         imageView.layer.masksToBounds = true
         imageView.layer.cornerRadius = 20
-        super.viewDidLoad()
+        
     }
     // MARK: - QuestionFactoryDelegate
     func didReceiveNextQuestion(question: QuizQuestion?) {
         guard let question = question else {
             return
         }
-
+        
         currentQuestion = question
         let viewModel = convert(model: question)
         DispatchQueue.main.async { [weak self] in
             self?.show(quiz: viewModel)
         }
-    } 
-        
+    }
+    
     
     @IBAction private func noButtonClicked(_ sender: Any) {
         let givenAnswer = false
@@ -71,7 +75,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
                     buttonText: "Сыграть ещё раз",
                     message: "Ваш результат \(correctAnswers)/10 \n Количество сыгранных квизов: \(statisticService?.gamesCount ?? 0) \n Рекорд: \(statisticService?.bestGame.correct ?? 0)/\(statisticService?.bestGame.total ?? 0) (\(statisticService?.bestGame.date ?? Date().dateTimeString)) \n Средняя точность: \(String(format: "%.2f", statisticService?.totalAccuracy ?? 0.0))%",
                     completion: {
-//                        self.statisticSystemElementation?.store(correct: self.correctAnswers, total: 10)
+                        //                        self.statisticSystemElementation?.store(correct: self.correctAnswers, total: 10)
                         self.currentQuestionIndex = 0
                         self.correctAnswers = 0
                         self.questionFactory?.requestNextQuestion()
@@ -85,9 +89,38 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         }
     }
     
+    func didLoadDataFromServer() {
+        activityIndicator.isHidden = true // скрываем индикатор загрузки
+        questionFactory?.requestNextQuestion()
+    }
+
+    func didFailToLoadData(with error: Error) {
+        showNetworkError(message: error.localizedDescription) // возьмём в качестве сообщения описание ошибки
+    }
+    
+    private func showLoadingIndicator() {
+        activityIndicator.isHidden = false // говорим, что индикатор больше не скрыт
+        activityIndicator.startAnimating() // Включаем анимацию
+    }
+    
+    private func showNetworkError(message: String) {
+        
+        let model = UIAlertController(title: "Error", message: message, preferredStyle: .alert)
+        let modelButton = UIAlertAction(title: "Return", style: .default, handler: { _ in
+            
+            self.currentQuestionIndex = 0
+            self.correctAnswers = 0
+            self.viewDidLoad()
+        })
+        
+        model.addAction(modelButton)
+        present(model, animated: true, completion: nil)
+//                alertPresenter.show(in: self, model: model)
+    }
+    
     private func convert (model: QuizQuestion) -> QuizStepViewModel{
         return QuizStepViewModel(
-            image: UIImage(named: model.image)  ?? UIImage (),
+            image: UIImage(data: model.image)  ?? UIImage (),
             question: model.text,
             questionNumber: "\(currentQuestionIndex + 1)/\(questionsAmount)"
         )
@@ -111,11 +144,11 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         
         self.present(alert, animated: true, completion: nil)
     }
-
-// приватный метод, который меняет цвет рамки
-// принимает на вход булевое значение и ничего не возвращает
+    
+    // приватный метод, который меняет цвет рамки
+    // принимает на вход булевое значение и ничего не возвращает
     private func showAnswerResult(isCorrect: Bool) {
-// метод красит рамку
+        // метод красит рамку
         
         if isCorrect {
             correctAnswers += 1
@@ -128,21 +161,18 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         
         // запускаем задачу через 1 секунду c помощью диспетчера задач
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-           // код, который мы хотим вызвать через 1 секунду
+            // код, который мы хотим вызвать через 1 секунду
             UIView.animate(withDuration: 0.2) { [weak self] in
                 self?.imageView.layer.borderWidth = 0
             }
             self.showNextQuestionOrResults()
         }
-        
     }
-    
-
 }
 
 
-    
-    
+
+
 
 /*
  Mock-данные
@@ -152,56 +182,56 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
  Настоящий рейтинг: 9,2
  Вопрос: Рейтинг этого фильма больше чем 6?
  Ответ: ДА
-
-
+ 
+ 
  Картинка: The Dark Knight
  Настоящий рейтинг: 9
  Вопрос: Рейтинг этого фильма больше чем 6?
  Ответ: ДА
-
-
+ 
+ 
  Картинка: Kill Bill
  Настоящий рейтинг: 8,1
  Вопрос: Рейтинг этого фильма больше чем 6?
  Ответ: ДА
-
-
+ 
+ 
  Картинка: The Avengers
  Настоящий рейтинг: 8
  Вопрос: Рейтинг этого фильма больше чем 6?
  Ответ: ДА
-
-
+ 
+ 
  Картинка: Deadpool
  Настоящий рейтинг: 8
  Вопрос: Рейтинг этого фильма больше чем 6?
  Ответ: ДА
-
-
+ 
+ 
  Картинка: The Green Knight
  Настоящий рейтинг: 6,6
  Вопрос: Рейтинг этого фильма больше чем 6?
  Ответ: ДА
-
-
+ 
+ 
  Картинка: Old
  Настоящий рейтинг: 5,8
  Вопрос: Рейтинг этого фильма больше чем 6?
  Ответ: НЕТ
-
-
+ 
+ 
  Картинка: The Ice Age Adventures of Buck Wild
  Настоящий рейтинг: 4,3
  Вопрос: Рейтинг этого фильма больше чем 6?
  Ответ: НЕТ
-
-
+ 
+ 
  Картинка: Tesla
  Настоящий рейтинг: 5,1
  Вопрос: Рейтинг этого фильма больше чем 6?
  Ответ: НЕТ
-
-
+ 
+ 
  Картинка: Vivarium
  Настоящий рейтинг: 5,8
  Вопрос: Рейтинг этого фильма больше чем 6?

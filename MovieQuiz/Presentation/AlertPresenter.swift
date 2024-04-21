@@ -7,14 +7,14 @@
 
 import UIKit
 
-class AlertPresenter {
+final class AlertPresenter {
     weak var viewContoller: UIViewController?
     
     init(viewContoller: UIViewController) {
         self.viewContoller = viewContoller
     }
     
-    private var questionFactory: QuestionFactoryProtocol? = QuestionFactory()
+    private var questionFactory: QuestionFactoryProtocol?
     // приватный метод для показа результатов раунда квиза
     // принимает вью модель QuizResultsViewModel и ничего не возвращает
     func show(quiz result: AlertModels) {
