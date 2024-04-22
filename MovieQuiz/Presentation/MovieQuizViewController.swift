@@ -7,6 +7,8 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     @IBOutlet private var textLabel: UILabel!
     @IBOutlet private var imageView: UIImageView!
     
+    @IBOutlet weak var yesButton: UIButton!
+    @IBOutlet weak var noButton: UIButton!
     @IBOutlet private var activityIndicator: UIActivityIndicatorView!
     private var questionsAmount: Int = 10 // общее количество вопросов для квиза. Пусть оно будет равно десяти.
     private var questionFactory: QuestionFactoryProtocol?// фабрика вопросов. Контроллер будет обращаться за вопросами к ней.
@@ -45,12 +47,16 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         let givenAnswer = false
         guard let currentQuestion = currentQuestion else {return}
         showAnswerResult(isCorrect: givenAnswer == currentQuestion.correctAnswer)
+        self.noButton.isEnabled = false
+        self.yesButton.isEnabled = false
     }
     
     @IBAction private func yesButtonClicked(_ sender: Any) {
         let givenAnswer = true
         guard let currentQuestion = currentQuestion else {return}
         showAnswerResult(isCorrect: givenAnswer == currentQuestion.correctAnswer)
+        self.yesButton.isEnabled = false
+        self.noButton.isEnabled = false
     }
     
     
@@ -110,7 +116,8 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
             
             self.currentQuestionIndex = 0
             self.correctAnswers = 0
-            self.viewDidLoad()
+            self.questionFactory?.requestNextQuestion()
+//            self.viewDidLoad()
         })
         
         model.addAction(modelButton)
@@ -164,6 +171,8 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
             // код, который мы хотим вызвать через 1 секунду
             UIView.animate(withDuration: 0.2) { [weak self] in
                 self?.imageView.layer.borderWidth = 0
+                self?.yesButton.isEnabled = true
+                self?.noButton.isEnabled = true
             }
             self.showNextQuestionOrResults()
         }
