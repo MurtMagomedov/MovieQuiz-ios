@@ -9,11 +9,11 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     
     @IBOutlet weak var yesButton: UIButton!
     @IBOutlet weak var noButton: UIButton!
+    private let presenter = MovieQuizPresenter()
     @IBOutlet private var activityIndicator: UIActivityIndicatorView!
-    private var questionsAmount: Int = 10 // общее количество вопросов для квиза. Пусть оно будет равно десяти.
+
     private var questionFactory: QuestionFactoryProtocol?// фабрика вопросов. Контроллер будет обращаться за вопросами к ней.
     private var currentQuestion: QuizQuestion? // вопрос, который видит пользователь.
-    private var currentQuestionIndex = 0
     private var correctAnswers = 0
     private var gameCount = 0
     private var statisticService: StatisticService? = StatisticServiceImplementation()
@@ -31,12 +31,12 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     }
     // MARK: - QuestionFactoryDelegate
     func didReceiveNextQuestion(question: QuizQuestion?) {
+        let viewModel = presenter.convert(model: question!)
         guard let question = question else {
             return
         }
         
         currentQuestion = question
-        let viewModel = convert(model: question)
         DispatchQueue.main.async { [weak self] in
             self?.show(quiz: viewModel)
         }
@@ -70,10 +70,10 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     // приватный метод, который содержит логику перехода в один из сценариев
     // метод ничего не принимает и ничего не возвращает
     private func showNextQuestionOrResults() {
-        if currentQuestionIndex == questionsAmount - 1 { // 1
+        if presenter.isLastQuestion() { // 1
             // идём в состояние "Результат квиза"
             gameCount += 1
-            self.statisticService?.store(correct: self.correctAnswers, total: questionsAmount)
+            self.statisticService?.store(correct: self.correctAnswers, total: presenter.questionsAmount)
             let alertPresenter = AlertPresenter(viewContoller: self)
             alertPresenter.show(
                 quiz: AlertModel(
@@ -82,14 +82,14 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
                     buttonText: "Сыграть ещё раз",
                     completion: {
                         //                        self.statisticSystemElementation?.store(correct: self.correctAnswers, total: 10)
-                        self.currentQuestionIndex = 0
+                        self.presenter.resetQuestionIndex()
                         self.correctAnswers = 0
                         self.questionFactory?.requestNextQuestion()
                     })
             )
         } else { // 2
             
-            currentQuestionIndex += 1
+            presenter.switchToNextQuestion()
             // идём в состояние "Вопрос показан"
             questionFactory?.requestNextQuestion()
         }
@@ -114,7 +114,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         let model = UIAlertController(title: "Error", message: message, preferredStyle: .alert)
         let modelButton = UIAlertAction(title: "Return", style: .default, handler: { _ in
             
-            self.currentQuestionIndex = 0
+            self.presenter.resetQuestionIndex()
             self.correctAnswers = 0
             self.questionFactory?.requestNextQuestion()
 //            self.viewDidLoad()
@@ -125,13 +125,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
 //                alertPresenter.show(in: self, model: model)
     }
     
-    private func convert (model: QuizQuestion) -> QuizStepViewModel{
-        return QuizStepViewModel(
-            image: UIImage(data: model.image)  ?? UIImage (),
-            question: model.text,
-            questionNumber: "\(currentQuestionIndex + 1)/\(questionsAmount)"
-        )
-    }
+
     // приватный метод для показа результатов раунда квиза
     // принимает вью модель QuizResultsViewModel и ничего не возвращает
     private func show(quiz result: QuizResultsViewModel) {
