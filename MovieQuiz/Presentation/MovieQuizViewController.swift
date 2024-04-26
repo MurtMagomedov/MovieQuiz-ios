@@ -21,7 +21,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        questionFactory = QuestionFactory(moviesLoader: MoviesLeader(), delegate: self)
+        questionFactory = QuestionFactory(moviesLoader: MoviesLoader(), delegate: self)
         questionFactory?.loadData()
         showLoadingIndicator()
         
@@ -76,10 +76,10 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
             self.statisticService?.store(correct: self.correctAnswers, total: questionsAmount)
             let alertPresenter = AlertPresenter(viewContoller: self)
             alertPresenter.show(
-                quiz: AlertModels(
+                quiz: AlertModel(
                     title: "Раунд завершён",
+                    message: "Ваш результат \(correctAnswers)/10 \n Количество сыгранных квизов: \(statisticService?.gamesCount ?? 0) \n Рекорд: \(statisticService?.bestGame.correct ?? 0)/\(statisticService?.bestGame.total ?? 0) (\(statisticService?.bestGame.date ?? Date().dateTimeString)) \n Средняя точность: \(String(format: "%.2f", statisticService?.totalAccuracy ?? 0.0))%", 
                     buttonText: "Сыграть ещё раз",
-                    message: "Ваш результат \(correctAnswers)/10 \n Количество сыгранных квизов: \(statisticService?.gamesCount ?? 0) \n Рекорд: \(statisticService?.bestGame.correct ?? 0)/\(statisticService?.bestGame.total ?? 0) (\(statisticService?.bestGame.date ?? Date().dateTimeString)) \n Средняя точность: \(String(format: "%.2f", statisticService?.totalAccuracy ?? 0.0))%",
                     completion: {
                         //                        self.statisticSystemElementation?.store(correct: self.correctAnswers, total: 10)
                         self.currentQuestionIndex = 0

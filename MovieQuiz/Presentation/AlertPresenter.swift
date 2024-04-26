@@ -17,7 +17,7 @@ final class AlertPresenter {
     private var questionFactory: QuestionFactoryProtocol?
     // приватный метод для показа результатов раунда квиза
     // принимает вью модель QuizResultsViewModel и ничего не возвращает
-    func show(quiz result: AlertModels) {
+    func show(quiz result: AlertModel) {
         let alert = UIAlertController(
             title: result.title,
             message: result.message,
