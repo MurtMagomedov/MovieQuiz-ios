@@ -43,20 +43,14 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     }
     
     
-    @IBAction private func noButtonClicked(_ sender: Any) {
-        let givenAnswer = false
-        guard let currentQuestion = currentQuestion else {return}
-        showAnswerResult(isCorrect: givenAnswer == currentQuestion.correctAnswer)
-        self.noButton.isEnabled = false
-        self.yesButton.isEnabled = false
+    @IBAction private func noButtonClicked(_ sender: UIButton) {
+        presenter.currentQuestion = currentQuestion
+        presenter.noButtonClicked()
     }
     
-    @IBAction private func yesButtonClicked(_ sender: Any) {
-        let givenAnswer = true
-        guard let currentQuestion = currentQuestion else {return}
-        showAnswerResult(isCorrect: givenAnswer == currentQuestion.correctAnswer)
-        self.yesButton.isEnabled = false
-        self.noButton.isEnabled = false
+    @IBAction private func yesButtonClicked(_ sender: UIButton) {
+        presenter.currentQuestion = currentQuestion
+        presenter.yesButtonClicked()
     }
     
     
@@ -148,7 +142,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     
     // приватный метод, который меняет цвет рамки
     // принимает на вход булевое значение и ничего не возвращает
-    private func showAnswerResult(isCorrect: Bool) {
+    func showAnswerResult(isCorrect: Bool) {
         // метод красит рамку
         
         if isCorrect {
