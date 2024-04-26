@@ -1,5 +1,4 @@
 import UIKit
-
 final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     // MARK: - Lifecycle
     
@@ -11,7 +10,6 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     @IBOutlet weak var noButton: UIButton!
     private let presenter = MovieQuizPresenter()
     @IBOutlet private var activityIndicator: UIActivityIndicatorView!
-
     private var questionFactory: QuestionFactoryProtocol?// фабрика вопросов. Контроллер будет обращаться за вопросами к ней.
     private var currentQuestion: QuizQuestion? // вопрос, который видит пользователь.
     private var correctAnswers = 0
@@ -43,17 +41,21 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     }
     
     
-    @IBAction private func noButtonClicked(_ sender: UIButton) {
-        presenter.currentQuestion = currentQuestion
-        presenter.noButtonClicked()
+    @IBAction private func noButtonClicked(_ sender: Any) {
+        let givenAnswer = false
+        guard let currentQuestion = currentQuestion else {return}
+        showAnswerResult(isCorrect: givenAnswer == currentQuestion.correctAnswer)
+        self.noButton.isEnabled = false
+        self.yesButton.isEnabled = false
     }
     
-    @IBAction private func yesButtonClicked(_ sender: UIButton) {
-        presenter.currentQuestion = currentQuestion
-        presenter.yesButtonClicked()
+    @IBAction private func yesButtonClicked(_ sender: Any) {
+        let givenAnswer = true
+        guard let currentQuestion = currentQuestion else {return}
+        showAnswerResult(isCorrect: givenAnswer == currentQuestion.correctAnswer)
+        self.yesButton.isEnabled = false
+        self.noButton.isEnabled = false
     }
-    
-    
     // приватный метод вывода на экран вопроса, который принимает на вход вью модель вопроса и ничего не возвращает
     private func show(quiz step: QuizStepViewModel) {
         imageView.image = step.image
@@ -72,7 +74,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
             alertPresenter.show(
                 quiz: AlertModel(
                     title: "Раунд завершён",
-                    message: "Ваш результат \(correctAnswers)/10 \n Количество сыгранных квизов: \(statisticService?.gamesCount ?? 0) \n Рекорд: \(statisticService?.bestGame.correct ?? 0)/\(statisticService?.bestGame.total ?? 0) (\(statisticService?.bestGame.date ?? Date().dateTimeString)) \n Средняя точность: \(String(format: "%.2f", statisticService?.totalAccuracy ?? 0.0))%", 
+                    message: "Ваш результат \(correctAnswers)/10 \n Количество сыгранных квизов: \(statisticService?.gamesCount ?? 0) \n Рекорд: \(statisticService?.bestGame.correct ?? 0)/\(statisticService?.bestGame.total ?? 0) (\(statisticService?.bestGame.date ?? Date().dateTimeString)) \n Средняя точность: \(String(format: "%.2f", statisticService?.totalAccuracy ?? 0.0))%",
                     buttonText: "Сыграть ещё раз",
                     completion: {
                         //                        self.statisticSystemElementation?.store(correct: self.correctAnswers, total: 10)
@@ -82,7 +84,6 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
                     })
             )
         } else { // 2
-            
             presenter.switchToNextQuestion()
             // идём в состояние "Вопрос показан"
             questionFactory?.requestNextQuestion()
@@ -93,7 +94,6 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         activityIndicator.isHidden = true // скрываем индикатор загрузки
         questionFactory?.requestNextQuestion()
     }
-
     func didFailToLoadData(with error: Error) {
         showNetworkError(message: error.localizedDescription) // возьмём в качестве сообщения описание ошибки
     }
@@ -107,21 +107,16 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         
         let model = UIAlertController(title: "Error", message: message, preferredStyle: .alert)
         let modelButton = UIAlertAction(title: "Return", style: .default, handler: { _ in
-            
             self.presenter.resetQuestionIndex()
             self.correctAnswers = 0
             self.questionFactory?.requestNextQuestion()
-//            self.viewDidLoad()
+            //            self.viewDidLoad()
         })
         
         model.addAction(modelButton)
         present(model, animated: true, completion: nil)
-//                alertPresenter.show(in: self, model: model)
+        //                alertPresenter.show(in: self, model: model)
     }
-    
-
-    // приватный метод для показа результатов раунда квиза
-    // принимает вью модель QuizResultsViewModel и ничего не возвращает
     private func show(quiz result: QuizResultsViewModel) {
         let alert = UIAlertController(
             title: result.title,
@@ -142,7 +137,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     
     // приватный метод, который меняет цвет рамки
     // принимает на вход булевое значение и ничего не возвращает
-    func showAnswerResult(isCorrect: Bool) {
+    private func showAnswerResult(isCorrect: Bool) {
         // метод красит рамку
         
         if isCorrect {
@@ -166,9 +161,6 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         }
     }
 }
-
-
-
 
 
 /*
