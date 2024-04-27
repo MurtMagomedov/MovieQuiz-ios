@@ -4,33 +4,26 @@
 //
 //  Created by Муртазали Магомедов on 28.11.2023.
 //
-
 import UIKit
 
-final class AlertPresenter {
-    weak var viewContoller: UIViewController?
+class AlertPresenter {
     
-    init(viewContoller: UIViewController) {
-        self.viewContoller = viewContoller
-    }
+    let alertPresenterDelegate: MovieQuizViewController
     
-    private var questionFactory: QuestionFactoryProtocol?
-    // приватный метод для показа результатов раунда квиза
-    // принимает вью модель QuizResultsViewModel и ничего не возвращает
-    func show(quiz result: AlertModel) {
+    func show(alertModel: AlertModel) {
         let alert = UIAlertController(
-            title: result.title,
-            message: result.message,
+            title: alertModel.title,
+            message: alertModel.message,
             preferredStyle: .alert)
         
-        let action = UIAlertAction(title: result.buttonText, style: .default) { [weak self] _ in
-            result.completion()
-            guard let self = self else { return }
-            self.questionFactory?.requestNextQuestion()
-        }
+        let action = UIAlertAction(title: alertModel.buttonText, style: .default, handler: { _ in alertModel.completion() })
         
         alert.addAction(action)
-        
-        viewContoller?.present(alert, animated: true, completion: nil)
+        alert.view.accessibilityIdentifier = "Этот раунд окончен!"
+        alertPresenterDelegate.present(alert, animated: true)
+    }
+    
+    init(alertPresenterDelegate: MovieQuizViewController) {
+        self.alertPresenterDelegate = alertPresenterDelegate
     }
 }

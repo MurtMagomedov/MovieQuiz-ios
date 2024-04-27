@@ -33,6 +33,9 @@
                                         <subviews>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Вопрос:" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Dgt-3G-zbi" userLabel="Question Title Label">
                                                 <rect key="frame" x="0.0" y="0.0" width="338" height="23.5"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="height" constant="23.5" id="eZQ-e4-G96"/>
+                                                </constraints>
                                                 <fontDescription key="fontDescription" name="YSDisplay-Medium" family="YS Display" pointSize="20"/>
                                                 <color key="textColor" name="YP White"/>
                                                 <nil key="highlightedColor"/>
@@ -123,12 +126,13 @@
                         </constraints>
                     </view>
                     <connections>
-                        <outlet property="activityIndicator" destination="Leu-Zh-mbf" id="Ag4-fq-xjS"/>
-                        <outlet property="counterLabel" destination="9ch-qg-y3I" id="k5O-KT-WBH"/>
-                        <outlet property="imageView" destination="2Od-qZ-CBs" id="tJD-l5-G6W"/>
-                        <outlet property="noButton" destination="BTh-7I-lub" id="8Lw-RY-B9D"/>
-                        <outlet property="textLabel" destination="Uds-Fw-eWs" id="yk5-5n-yDR"/>
-                        <outlet property="yesButton" destination="gOk-lC-51t" id="hIN-36-rUy"/>
+                        <outlet property="activityIndicator" destination="Leu-Zh-mbf" id="vkg-uC-O9u"/>
+                        <outlet property="counterLabel" destination="9ch-qg-y3I" id="b8R-Vm-YYG"/>
+                        <outlet property="imageView" destination="2Od-qZ-CBs" id="DXF-fp-uR2"/>
+                        <outlet property="noBottun" destination="BTh-7I-lub" id="ATS-ta-hsi"/>
+                        <outlet property="questionLabel" destination="Uds-Fw-eWs" id="jBz-hM-Yj3"/>
+                        <outlet property="questionTitleLabel" destination="Dgt-3G-zbi" id="oSk-w1-TxS"/>
+                        <outlet property="yesBottun" destination="gOk-lC-51t" id="8la-ZR-2es"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>

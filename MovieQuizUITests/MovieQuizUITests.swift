@@ -4,12 +4,11 @@
 //
 //  Created by Муртазали Магомедов on 26.04.2024.
 //
-
 import XCTest
 
-final class MovieQuizUITests: XCTestCase {
+var app: XCUIApplication!
 
-    var app: XCUIApplication!
+final class MovieQuizUITests: XCTestCase {
     
     override func setUpWithError() throws {
         try super.setUpWithError()
@@ -19,77 +18,90 @@ final class MovieQuizUITests: XCTestCase {
         
         continueAfterFailure = false
     }
-
+    
     override func tearDownWithError() throws {
         try super.tearDownWithError()
         
         app.terminate()
         app = nil
     }
-
+    
+    func testExample() throws {
+        let app = XCUIApplication()
+        app.launch()
+    }
+    
     func testYesButton() {
-        sleep(3)
+        sleep(2)
         
-        let indexLabel = app.staticTexts["Index"]
         let firstPoster = app.images["Poster"]
         let firstPosterData = firstPoster.screenshot().pngRepresentation
+        let firstQuestion = app.staticTexts["question"]
         
         app.buttons["Yes"].tap()
-        sleep(3)
+        sleep(2)
         
         let secondPoster = app.images["Poster"]
         let secondPosterData = secondPoster.screenshot().pngRepresentation
+        let secondQuestion = app.staticTexts["question"]
         
-        XCTAssertEqual(indexLabel.label, "2/10")
         XCTAssertNotEqual(firstPosterData, secondPosterData)
+        
+        let indexLabel = app.staticTexts["index"]
+        XCTAssertEqual(indexLabel.label, "2/10")
+        XCTAssertNotEqual(firstQuestion, secondQuestion)
     }
     
     func testNoButton() {
-        sleep(3)
+        sleep(2)
         
-        let indexLabel = app.staticTexts["Index"]
         let firstPoster = app.images["Poster"]
         let firstPosterData = firstPoster.screenshot().pngRepresentation
+        let firstQuestion = app.staticTexts["question"]
         
         app.buttons["No"].tap()
-        sleep(3)
+        sleep(2)
         
         let secondPoster = app.images["Poster"]
         let secondPosterData = secondPoster.screenshot().pngRepresentation
+        let secondQuestion = app.staticTexts["question"]
         
-        XCTAssertEqual(indexLabel.label, "2/10")
         XCTAssertNotEqual(firstPosterData, secondPosterData)
+        
+        let indexLabel = app.staticTexts["index"]
+        XCTAssertEqual(indexLabel.label, "2/10")
+        XCTAssertNotEqual(firstQuestion, secondQuestion)
     }
     
-    func testAlert() {
-        sleep(2)
+    func testGameFinish() {
+        sleep(3)
         for _ in 1...10 {
             app.buttons["No"].tap()
-            sleep(2)
+            sleep(3)
         }
-
-        let alert = app.alerts["Раунд завершён"]
+        
+        let alert = app.alerts["Этот раунд окончен!"]
         
         XCTAssertTrue(alert.exists)
-        XCTAssertTrue(alert.label == "Раунд завершён")
+        XCTAssertTrue(alert.label == "Этот раунд окончен!")
         XCTAssertTrue(alert.buttons.firstMatch.label == "Сыграть ещё раз")
     }
-
-    func testAlertFinished() {
-        sleep(2)
-        for _ in 1...10 {
-            app.buttons["No"].tap()
+    
+    func testAlertDismiss() {
             sleep(2)
+            for _ in 1...10 {
+                app.buttons["No"].tap()
+                sleep(2)
+            }
+            
+            let alert = app.alerts["Этот раунд окончен!"]
+            alert.buttons.firstMatch.tap()
+            
+            sleep(2)
+            
+            let indexLabel = app.staticTexts["index"]
+            
+            XCTAssertFalse(alert.exists)
+            XCTAssertTrue(indexLabel.label == "1/10")
         }
-        
-        let alert = app.alerts["Раунд завершён"]
-        alert.buttons.firstMatch.tap()
-        
-        sleep(2)
-        
-        let indexLabel = app.staticTexts["Index"]
-        
-        XCTAssertFalse(alert.exists)
-        XCTAssertTrue(indexLabel.label == "1/10")
-    }
 }

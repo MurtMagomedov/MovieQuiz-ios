@@ -1,6 +1,6 @@
 //
 //  MoviesLoader.swift
-//  MovieQuiz
+//  MovieQuiz  k_zcuw1ytf
 //
 //  Created by Муртазали Магомедов on 14.04.2024.
 //
@@ -12,15 +12,15 @@ protocol MoviesLoading {
 }
 
 struct MoviesLoader: MoviesLoading {
-  // MARK: - NetworkClient
-  private let networkClient: NetworkRouting
-  
-  init(networkClient: NetworkRouting = NetworkClient()) {
-      self.networkClient = networkClient
-  }
+    // MARK: - NetworkClient
+    private let networkClient: NetworkRouting
     
+    init(networkClient: NetworkRouting = NetworkClient()) {
+        self.networkClient = networkClient
+    }
     // MARK: - URL
     private var mostPopularMoviesUrl: URL {
+        // Если мы не смогли преобразовать строку в URL, то приложение упадёт с ошибкой
         guard let url = URL(string: "https://tv-api.com/en/API/Top250Movies/k_zcuw1ytf") else {
             preconditionFailure("Unable to construct mostPopularMoviesUrl")
         }
@@ -31,15 +31,14 @@ struct MoviesLoader: MoviesLoading {
         networkClient.fetch(url: mostPopularMoviesUrl) { result in
             switch result {
             case .success(let data):
-                do {
-                    let mostPopularMovies = try JSONDecoder().decode(MostPopularMovies.self, from: data)
-                    handler(.success(mostPopularMovies))
-                } catch {
-                    handler(.failure(error))
-                }
+                do{
+                    let movies = try JSONDecoder().decode(MostPopularMovies.self, from: data)
+                    handler(.success(movies))
+                } catch { handler(.failure(error)) }
             case .failure(let error):
-                handler(.failure(error))
+                handler(Result.failure(error))
             }
+            return
         }
     }
 }
