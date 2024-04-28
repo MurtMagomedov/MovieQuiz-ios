@@ -1,15 +1,15 @@
 //
-//  AllertModels.swift
+//  AlertModel.swift
 //  MovieQuiz
 //
-//  Created by Муртазали Магомедов on 28.11.2023.
+//  Created by m.daudov on 26.09.2022.
 //
 
 import Foundation
 
-struct AlertModels {
+struct AlertModel {
     var title: String
-    var buttonText: String
     var message: String
-    var completion: () -> ()
+    var buttonText: String
+    var completion: () -> Void
 }
