@@ -96,8 +96,6 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
         let givenAnswer = isYes
         
         proceedWithAnswer(isCorrect: givenAnswer == currentQuestion.correctAnswer)
-        viewController?.noBottun.isEnabled = false
-        viewController?.yesBottun.isEnabled = false
     }
     
     private func proceedWithAnswer(isCorrect: Bool) {
@@ -108,8 +106,6 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
             guard let self = self else { return }
             self.proceedToNextQuestionOrResults()
-            viewController?.noBottun.isEnabled = true
-            viewController?.yesBottun.isEnabled = true
         }
     }
     
@@ -138,7 +134,7 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
         let totalPlaysCountLine = "Количество сыгранных квизов: \(statisticService.gamesCount)"
         let currentGameResultLine = "Ваш результат: \(correctAnswers)\\\(questionsAmount)"
         let bestGameInfoLine = "Рекорд: \(bestGame.correct)\\\(bestGame.total)"
-        + " (\(Date().dateTimeString)"
+        + " (\(Date().dateTimeString))"
         let averageAccuracyLine = "Средняя точность: \(String(format: "%.2f", statisticService.totalAccuracy))%"
         
         let resultMessage = [

@@ -47,7 +47,7 @@ final class MovieQuizUITests: XCTestCase {
         
         XCTAssertNotEqual(firstPosterData, secondPosterData)
         
-        let indexLabel = app.staticTexts["index"]
+        let indexLabel = app.staticTexts["Index"]
         XCTAssertEqual(indexLabel.label, "2/10")
         XCTAssertNotEqual(firstQuestion, secondQuestion)
     }
@@ -68,7 +68,7 @@ final class MovieQuizUITests: XCTestCase {
         
         XCTAssertNotEqual(firstPosterData, secondPosterData)
         
-        let indexLabel = app.staticTexts["index"]
+        let indexLabel = app.staticTexts["Index"]
         XCTAssertEqual(indexLabel.label, "2/10")
         XCTAssertNotEqual(firstQuestion, secondQuestion)
     }
@@ -99,7 +99,7 @@ final class MovieQuizUITests: XCTestCase {
             
             sleep(2)
             
-            let indexLabel = app.staticTexts["index"]
+            let indexLabel = app.staticTexts["Index"]
             
             XCTAssertFalse(alert.exists)
             XCTAssertTrue(indexLabel.label == "1/10")

@@ -25,10 +25,23 @@ final class MovieQuizViewController: UIViewController, MovieQuizViewControllerPr
     
     @IBAction func yesButtonClicked(_ sender: UIButton) {
         presenter.yesButtonClicked()
+        buttonIsEnabled()
     }
     
     @IBAction func noButtonClicked(_ sender: UIButton) {
         presenter.noButtonClicked()
+        buttonIsEnabled()
+    }
+    
+    func buttonIsEnabled () {
+        noBottun.isEnabled = false
+        yesBottun.isEnabled = false
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
+            guard let self = self else { return }
+            noBottun.isEnabled = true
+            yesBottun.isEnabled = true
+        }
     }
     
     
